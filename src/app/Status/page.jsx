@@ -1,13 +1,12 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { ref, get, set } from "firebase/database";
+import { ref, get, update } from "firebase/database";
 import { database, auth } from "../firebaseConfig";
 import { useRouter } from "next/navigation";
 
 const Status = () => {
   const [wifi, setWifi] = useState("");
-  const [waterlvl, setWaterlvl] = useState("");
   const [pumpStatus, setPumpStatus] = useState(false);
   const [tapStatus, setTapStatus] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -15,14 +14,26 @@ const Status = () => {
   const router = useRouter();
 
   const fetchControlData = async () => {
-    const controlRef = ref(database, "control");
+    const controlRef = ref(database);
     const snapshot = await get(controlRef);
     if (snapshot.exists()) {
       const data = snapshot.val();
-      setWifi(data.wifi || "");
-      setWaterlvl(data.waterlvl || "");
-      setPumpStatus(data.pumpStatus || false);
-      setTapStatus(data.tapStatus || false);
+
+      // Mengambil semua kunci dari objek WiFi
+      const wifiKeys = data.WiFi ? Object.keys(data.WiFi) : [];
+      if (wifiKeys.length > 0) {
+        // Mengambil kunci terbaru
+        const latestKey = wifiKeys[wifiKeys.length - 1];
+        // Mengambil nilai dari kunci terbaru
+        const latestWifi = data.WiFi[latestKey];
+
+        setWifi(latestWifi || "");
+      } else {
+        setWifi("");
+      }
+
+      setPumpStatus(data.pompa || false);
+      setTapStatus(data.kran || false);
     }
   };
 
@@ -48,17 +59,16 @@ const Status = () => {
     fetchUserData();
   }, []);
 
-  const handleAddData = () => {
+  const handleAddData = async () => {
     try {
-      const controlRef = ref(database, "control");
+      const controlRef = ref(database);
       const newData = {
-        wifi: wifi,
-        waterlvl: waterlvl,
-        pumpStatus: pumpStatus ? 1 : 0,
-        tapStatus: tapStatus ? 1 : 0,
+        WiFi: wifi,
+        pompa: pumpStatus ? 1 : 0,
+        kran: tapStatus ? 1 : 0,
       };
 
-      set(controlRef, newData);
+      await update(controlRef, newData);
 
       Swal.fire({
         icon: "success",
@@ -142,12 +152,6 @@ const Status = () => {
           onChange={(e) => setWifi(e.target.value)}
         />
 
-        <ControlInput
-          label="Level Air"
-          id="waterlvl"
-          value={waterlvl}
-          onChange={(e) => setWaterlvl(e.target.value)}
-        />
         <div className="md:flex flex-row md:m-6">
           <ControlSwitch
             label="Pompa"
@@ -202,6 +206,8 @@ const ControlSwitch = ({ label, id, isChecked, onToggle }) => {
         className="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3 checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
       />
     </div>
+ 
+
   );
 };
 

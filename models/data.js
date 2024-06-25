@@ -24,8 +24,11 @@ const Data = sequelize.define('Data', {
     type: DataTypes.DATEONLY,
     allowNull:false,
     defaultValue: DataTypes.NOW, // Mengisi kolom date dengan tanggal saat ini secara otomatis
-
-  }
+  },
+  time:{
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = Data;

@@ -2,13 +2,22 @@
 const Data = require("../../models/data");
 const { Sequelize } = require("sequelize");
 
+const now = new Date();
+
+
 function getFormattedDateTime() {
-  const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0"); // getMonth() returns month from 0-11
   const day = String(now.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+function time1() {
+  const minute = now.getMinutes()
+  const hour = now.getHours()
+
+  return `${hour}:${minute}`;
 }
 
 export default async function handler(req, res) {
@@ -32,6 +41,7 @@ export default async function handler(req, res) {
           phValue: parseFloat(phValue),
           ppmValue: parseFloat(ppmValue),
           suhuValue: parseFloat(suhuValue),
+          time:time1()
         });
 
         res.status(201).json({ status: "success" });

@@ -7,7 +7,7 @@ const NilaiSensor = () => {
   const [sensor, setSensor] = useState({ suhu: 0, pH: 0, ppm: 0 });
 
   useEffect(() => {
-    const sensorDataRef = ref(database);
+    const sensorDataRef = ref(database, "Sensor");
 
     const fetchData = () => {
       try {
@@ -15,11 +15,27 @@ const NilaiSensor = () => {
           if (snapshot.exists()) {
             const data = snapshot.val();
 
-            setSensor({
-              suhu: parseFloat(data.suhu),
-              pH: parseFloat(data.pH),
-              ppm: parseFloat(data.ppm),
-            });
+            // Mendapatkan semua tanggal
+            const dates = Object.keys(data);
+            if (dates.length > 0) {
+              // Mendapatkan tanggal terbaru
+              const latestDate = dates[dates.length - 1];
+              const latestData = data[latestDate];
+
+              // Mendapatkan semua waktu pada tanggal terbaru
+              const times = Object.keys(latestData);
+              if (times.length > 0) {
+                // Mendapatkan waktu terbaru
+                const latestTime = times[times.length - 1];
+                const latestSensorData = latestData[latestTime];
+
+                setSensor({
+                  suhu: parseFloat(latestSensorData.SUHU),
+                  pH: parseFloat(latestSensorData.PH),
+                  ppm: parseFloat(latestSensorData.PPM),
+                });
+              }
+            }
           } else {
             console.log("No Data Available");
           }

@@ -25,36 +25,62 @@ ChartJS.register(
 );
 
 const SensorChart = () => {
-  const [sensorData, setSensorData] = useState({});
+  const [sensorData, setSensorData] = useState({ ph: [], ppm: [], suhu: [] });
+  const [labels, setLabels] = useState([]);
 
   useEffect(() => {
-    const sensorDataRef = ref(database);
+    const sensorDataRef = ref(database, "Sensor");
 
     const fetchData = () => {
       onValue(sensorDataRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          setSensorData(data);
+          const dates = Object.keys(data);
+
+          let phValues = [];
+          let ppmValues = [];
+          let suhuValues = [];
+          let timeLabels = [];
+
+          dates.forEach((date) => {
+            const times = Object.keys(data[date]);
+            times.forEach((time) => {
+              const sensorValues = data[date][time];
+              phValues.push(sensorValues.PH);
+              ppmValues.push(sensorValues.PPM);
+              suhuValues.push(sensorValues.SUHU);
+              timeLabels.push(`${date} ${time}`);
+            });
+          });
+
+          setSensorData({
+            ph: phValues,
+            ppm: ppmValues,
+            suhu: suhuValues,
+          });
+          setLabels(timeLabels);
         } else {
           console.log("No Data Available");
-          setSensorData({});
         }
       });
     };
 
     fetchData();
 
+    const interval = setInterval(fetchData, 60000); // 1 menit = 60000 ms
+
     return () => {
+      clearInterval(interval);
       off(sensorDataRef);
     };
   }, []);
 
   const data = {
-    labels: ["pH", "ppm", "suhu"],
+    labels: labels,
     datasets: [
       {
         label: "pH",
-        data: [sensorData.pH],
+        data: sensorData.ph,
         borderColor: "#cb0c9f",
         borderWidth: 3,
         pointBorderColor: "#cb0c9f",
@@ -71,7 +97,7 @@ const SensorChart = () => {
       },
       {
         label: "PPM",
-        data: [sensorData.ppm],
+        data: sensorData.ppm,
         borderColor: "#4caf50",
         borderWidth: 3,
         pointBorderColor: "#4caf50",
@@ -88,7 +114,7 @@ const SensorChart = () => {
       },
       {
         label: "Suhu",
-        data: [sensorData.suhu],
+        data: sensorData.suhu,
         borderColor: "#2196f3",
         borderWidth: 3,
         pointBorderColor: "#2196f3",

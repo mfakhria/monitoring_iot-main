@@ -4,14 +4,14 @@ import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBwmbCKEGu_rG_PCjbDhNW2IVlTbPrpPqM",
-  authDomain: "esp8266-a085d.firebaseapp.com",
-  databaseURL: "https://esp8266-a085d-default-rtdb.firebaseio.com",
-  projectId: "esp8266-a085d",
-  storageBucket: "esp8266-a085d.appspot.com",
-  messagingSenderId: "430865351820",
-  appId: "1:430865351820:web:92c990bff343b2fa79a7a9",
-  measurementId: "G-5XVYM0B13H"
+  apiKey: "AIzaSyCYQWViDeT3IKN59MT_UBSM0bVGo_fATqo",
+  authDomain: "hidroponik-67eef.firebaseapp.com",
+  databaseURL: "https://hidroponik-67eef-default-rtdb.firebaseio.com",
+  projectId: "hidroponik-67eef",
+  storageBucket: "hidroponik-67eef.appspot.com",
+  messagingSenderId: "263388235146",
+  appId: "1:263388235146:web:f55fbe4a82f207abb97473",
+  measurementId: "G-TRVE5Y74SQ"
 };
 
 const app = initializeApp(firebaseConfig);
