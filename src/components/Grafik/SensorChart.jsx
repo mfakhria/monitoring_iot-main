@@ -27,6 +27,7 @@ ChartJS.register(
 const SensorChart = () => {
   const [sensorData, setSensorData] = useState({ ph: [], ppm: [], suhu: [] });
   const [labels, setLabels] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const sensorDataRef = ref(database, "Sensor");
@@ -74,6 +75,25 @@ const SensorChart = () => {
       off(sensorDataRef);
     };
   }, []);
+
+  const filteredLabels = labels.filter((label) =>
+    label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredPhValues = filteredLabels.map((label) => {
+    const index = labels.indexOf(label);
+    return sensorData.ph[index];
+  });
+
+  const filteredPpmValues = filteredLabels.map((label) => {
+    const index = labels.indexOf(label);
+    return sensorData.ppm[index];
+  });
+
+  const filteredSuhuValues = filteredLabels.map((label) => {
+    const index = labels.indexOf(label);
+    return sensorData.suhu[index];
+  });
 
   const data = {
     labels: labels,
@@ -191,8 +211,37 @@ const SensorChart = () => {
         Live Chart
       </h1>
 
-      <div className="rounded-lg p-5 bg-white items-center justify-center container mx-auto max-w-6xl mt-6 md:mt-5 mb-10 md:mb-32">
+      <div className="rounded-lg p-5 bg-white items-center justify-center container mx-auto max-w-6xl mt-6 md:mt-5 mb-10 md:mb-10">
         <Line data={data} options={options}></Line>
+      </div>
+      <div className="bg-white p-5 rounded-lg shadow-md w-full max-w-6xl mb-6">
+        <h2 className="text-xl font-semibold mb-4">Daily Data Summary</h2>
+        <input
+          type="text"
+          placeholder="Search by date"
+          className="mb-4 p-2 border border-gray-300 rounded"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <div className="overflow-y-auto" style={{ maxHeight: "200px" }}>
+          {filteredLabels.map((date, index) => (
+            <div key={index} className="mb-2">
+              <p>
+                <strong>Date:</strong> {date}
+              </p>
+              <p>
+                <strong>pH:</strong> {filteredPhValues[index].toFixed(2)}
+              </p>
+              <p>
+                <strong>PPM:</strong> {filteredPpmValues[index].toFixed(2)}
+              </p>
+              <p>
+                <strong>Suhu:</strong> {filteredSuhuValues[index].toFixed(2)}°C
+              </p>
+              <hr className="my-2" />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
