@@ -230,13 +230,13 @@ const SensorChart = () => {
                 <strong>Date:</strong> {date}
               </p>
               <p>
-                <strong>pH:</strong> {filteredPhValues[index].toFixed(2)}
+                <strong>pH:</strong> {filteredPhValues[index] !== undefined ? filteredPhValues[index].toFixed(2) : "N/A"}
               </p>
               <p>
-                <strong>PPM:</strong> {filteredPpmValues[index].toFixed(2)}
+                <strong>PPM:</strong> {filteredPpmValues[index] !== undefined ? filteredPpmValues[index].toFixed(2) : "N/A"}
               </p>
               <p>
-                <strong>Suhu:</strong> {filteredSuhuValues[index].toFixed(2)}°C
+                <strong>Suhu:</strong> {filteredSuhuValues[index] !== undefined ? filteredSuhuValues[index].toFixed(2) : "N/A"}°C
               </p>
               <hr className="my-2" />
             </div>
